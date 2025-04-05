@@ -1,3 +1,4 @@
+
 final class PayCheck {
     private final double grossPay;
     private final double fica;
