@@ -1,28 +1,35 @@
 package prob2;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class Customer {
-  private String name;
-  private List<Order> orders;
+final public class Customer {
+    private final String name;
+    private final List<Order> orders;
 
-   Customer(String name) {
-    this.name = name;
-    orders = new ArrayList<>();
-  }
+    Customer(String name) {
+        this.name = name;
+        this.orders = new ArrayList<>();
+    }
 
-  public void addOrder(Order ord) {
-    orders.add(ord);
-  }
+    public void addOrder(Order order) {
+        orders.add(order);
+    }
 
-  public String getName() {
-    return name;
-  }
+    public List<Order> getOrders() {
+        return orders;
+    }
 
-  public List<Order> getOrders() {
-    return Collections.unmodifiableList(orders);
-  }
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "name='" + name + '\'' +
+                ", orders=" + orders +
+                '}';
+    }
 }
+

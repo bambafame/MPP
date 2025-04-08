@@ -1,44 +1,44 @@
-import prob1.DecoyDuck;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+/*import prob1.DecoyDuck;
 import prob1.Duck;
 import prob1.DuckFactory;
 import prob1.MallardDuck;
 import prob1.RedHeadDuck;
-import prob1.RubberDuck;
-import prob2.CustOrderFactory;
-import prob2.Customer;
-import prob2.Item;
-import prob2.Order;
+import prob1.RubberDuck;*/
+import prob2.*;
 
 public class Main {
-  public static void main(String[] args) {
-    /*Customer customer = CustOrderFactory.createCustomer("Cheikh");
-    Order order1 = CustOrderFactory.createOrder(customer);
+	public static void main(String[] args) {
+		/**
+		 Duck[] ducks = {
+		 DuckFactory.createDuck("Mallard"), DuckFactory.createDuck("Decoy"), DuckFactory.createDuck("RedHead"), DuckFactory.createDuck("Rubber")
+		 };
 
-    Item item1 = CustOrderFactory.createItem("Laptop");
-    Item item2 = CustOrderFactory.createItem("Mouse");
+		 for(Duck duck : ducks) {
+		 System.out.println(duck.getClass().getSimpleName()+ " : ");
+		 //duck.display();
+		 duck.fly();
+		 duck.quack();
+		 duck.swim();
+		 System.out.println();
+		 }
+		 */
+		CustomerAndOrders result = CustomerOrderFactory.createCustomerAndOrder("Cheick", LocalDate.now());
 
-    CustOrderFactory.addItemToOrder(item1, order1);
-    CustOrderFactory.addItemToOrder(item2, order1);
+        Customer customer = result.getCustomer();
+        Order order = result.getOrder();
 
-    System.out.println("Customer: " + customer.getName());
-    for (Order order : customer.getOrders()) {
-      System.out.println("Order Number: " + order.getOrderDate());
-      for (Item item : order.getItems()) {
-        System.out.println(" - Item: " + item.getName());
-      }
-    }*/
-    Duck[] ducks = {
-        DuckFactory.createDuck("Mallard"), DuckFactory.createDuck("Decoy"), DuckFactory.createDuck("RedHead"), DuckFactory.createDuck("Rubber")
-    };
+        order.addItem(new Item("Laptop"));
+        order.addItem(new Item("Headphones"));
 
-    for(Duck duck : ducks) {
-      System.out.println(duck.getClass().getSimpleName()+ " : ");
-      //duck.display();
-      duck.fly();
-      duck.quack();
-      duck.swim();
-      System.out.println();
+
+        Order secondOrder = CustomerOrderFactory.createOrder(LocalDate.of(2025, 4, 8));
+        secondOrder.addItem(new Item("Mouse"));
+        customer.addOrder(secondOrder);
+
+        System.out.println(customer);
     }
-
-  }
 }
