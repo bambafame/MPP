@@ -1,0 +1,5 @@
+In EmployeeInfo.java, removeDuplicates() uses a
+HashMap<Employee, Employee> to detect duplicates. But visited starts as false,
+and later gets set to true for duplicates. This changes the object's internal state,
+which alters the result of both equals() and hashCode() because they both include visited
+As a solution, we should delete visited field in both equals() and hashCode() method

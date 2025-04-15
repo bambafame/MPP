@@ -1,0 +1,3 @@
+In the class Employee, the equals method is not overridden because instead of using
+a parameter of type Object it uses a parameter of type Employee so when we call the
+ equals method inside inList method, it calls the one coming from the class Object.

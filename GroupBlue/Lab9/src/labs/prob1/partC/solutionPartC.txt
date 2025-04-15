@@ -1,0 +1,3 @@
+Since we use the class HashMap of Employee, we should implement the
+hashCode method in the Employee class in order to compare keys while using the
+getContainKey() method from the Map interface.
