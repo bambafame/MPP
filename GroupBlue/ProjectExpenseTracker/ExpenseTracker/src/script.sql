@@ -1,3 +1,7 @@
+use expenseTracker;
+
+
+
 CREATE TABLE users (
     username VARCHAR(50) PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
@@ -10,7 +14,7 @@ CREATE TABLE users (
 CREATE TABLE categories (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE,
-    description VARCHAR(255)
+    description VARCHAR(500)
 );
 
 CREATE TABLE expenses (

@@ -5,14 +5,18 @@ public class RegularUser extends User{
 
   public RegularUser(String firstname, String lastname) {
     super(firstname, lastname);
+    this.role = Role.REGULAR;
   }
 
   public RegularUser(String firstname, String lastname, double budgetLimit) {
     super(firstname, lastname);
     this.budgetLimit = budgetLimit;
+    this.role = Role.REGULAR;
   }
 
-  public RegularUser() {}
+  public RegularUser() {
+    this.role = Role.REGULAR;
+  }
 
   public double getBudgetLimit() {
     return budgetLimit;
