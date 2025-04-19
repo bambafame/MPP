@@ -50,4 +50,5 @@ public class Problem {
 		List<Customer> list = Arrays.asList(cust1, cust2, cust3, cust4, cust5, cust6, cust7);		
 		System.out.println("Zipcodes of Customers whose city name has length >= 6 but does not contain the letter 'e': " + getZipsOfSpecialCustomers(list));
 	}
+	
 }
