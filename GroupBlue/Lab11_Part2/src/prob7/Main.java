@@ -16,13 +16,21 @@ public class Main {
 		
 	}
 	
-	//Orders the integers according to this pattern:
+	//Orders the integers according to this pattern: Comparator.comparing(x -> Math.abs(x))
 	// 0, -1, 1, -2, 2, -3, 3, . . .
 	//Using this ordering, this method sorts the list as part of 
 	//a stream pipeline, and prints to the console
 	public static void ordering1(List<Integer> list) {
 		System.out.println(list.stream()
-				.sorted(Comparator.comparing(Math::abs))
+				.sorted((x, y) -> {
+					if(x == -y) {
+						return -1;
+					}else if(y == -x) {
+						return 1;
+					}else {
+						return Integer.compare(Math.abs(x), Math.abs(y));
+					}
+				})
 				.toList()
 		);
 		

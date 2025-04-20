@@ -4,6 +4,8 @@ import entities.Admin;
 import entities.RegularUser;
 import entities.User;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
 
@@ -40,4 +42,27 @@ public class UserDAO {
     }
     return null;
   }
+
+  public double getBudgetLimit(String userId) throws SQLException {
+    String sql = "SELECT budget_limit FROM users WHERE username = ?";
+    PreparedStatement ps = conn.prepareStatement(sql);
+    ps.setString(1, userId);
+    ResultSet rs = ps.executeQuery();
+    if (rs.next()) {
+      return rs.getDouble("budget_limit");
+    }
+    return 0.0;
+  }
+  public List<String> getAllRegularUsernames() throws SQLException {
+    List<String> usernames = new ArrayList<>();
+    String sql = "SELECT username FROM users WHERE role = 'REGULAR'";
+    try (PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery()) {
+      while (rs.next()) {
+        usernames.add(rs.getString("username"));
+      }
+    }
+    return usernames;
+  }
+
 }
