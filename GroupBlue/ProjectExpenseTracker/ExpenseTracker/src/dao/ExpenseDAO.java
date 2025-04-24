@@ -1,6 +1,8 @@
 package dao;
 
+import entities.Category;
 import entities.Expense;
+import entities.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,14 +16,14 @@ public class ExpenseDAO {
   }
 
   public void addExpense(Expense e) throws SQLException {
-    if (!canAddOrUpdateExpense(e.getUserId(), e.getAmount())) {
+    if (!canAddOrUpdateExpense(e.getUser().getUsername(), e.getAmount())) {
       throw new SQLException("Budget limit exceeded");
     }
 
     String sql = "INSERT INTO expenses (user_id, category_id, amount, date, description) VALUES (?, ?, ?, ?, ?)";
     PreparedStatement ps = conn.prepareStatement(sql);
-    ps.setString(1, e.getUserId());
-    ps.setInt(2, e.getCategoryId());
+    ps.setString(1, e.getUser().getUsername());
+    ps.setInt(2, e.getCategory().getId());
     ps.setDouble(3, e.getAmount());
     ps.setDate(4, new java.sql.Date(e.getDate().getTime()));
     ps.setString(5, e.getDescription());
@@ -29,13 +31,13 @@ public class ExpenseDAO {
   }
 
   public void updateExpense(Expense e) throws SQLException {
-    if (!canAddOrUpdateExpense(e.getUserId(), e.getAmount(), e.getId())) {
+    if (!canAddOrUpdateExpense(e.getUser().getUsername(), e.getAmount(), e.getId())) {
       throw new SQLException("Budget limit exceeded");
     }
 
     String sql = "UPDATE expenses SET category_id=?, amount=?, date=?, description=? WHERE id=?";
     PreparedStatement ps = conn.prepareStatement(sql);
-    ps.setInt(1, e.getCategoryId());
+    ps.setInt(1, e.getCategory().getId());
     ps.setDouble(2, e.getAmount());
     ps.setDate(3, new java.sql.Date(e.getDate().getTime()));
     ps.setString(4, e.getDescription());
@@ -52,8 +54,8 @@ public class ExpenseDAO {
     double budgetLimit = 0;
 
     String expenseSql = excludeExpenseId == -1 ?
-      "SELECT SUM(amount) AS total FROM expenses WHERE user_id=?" :
-      "SELECT SUM(amount) AS total FROM expenses WHERE user_id=? AND id != ?";
+        "SELECT SUM(amount) AS total FROM expenses WHERE user_id=?" :
+        "SELECT SUM(amount) AS total FROM expenses WHERE user_id=? AND id != ?";
 
     PreparedStatement expStmt = conn.prepareStatement(expenseSql);
     expStmt.setString(1, userId);
@@ -102,48 +104,47 @@ public class ExpenseDAO {
     while (rs.next()) {
       Expense e = new Expense();
       e.setId(rs.getInt("id"));
-      e.setUserId(rs.getString("user_id"));
-      e.setCategoryId(rs.getInt("category_id"));
+
+
+      User user = new User() {};
+      user.setUsername(rs.getString("user_id"));
+      e.setUser(user);
+
+      Category cat = new Category();
+      cat.setId(rs.getInt("category_id"));
+      e.setCategory(cat);
+
       e.setAmount(rs.getDouble("amount"));
       e.setDate(rs.getDate("date"));
       e.setDescription(rs.getString("description"));
-      list.add(e);
-    }
-    return list;
-  }
 
-  public List<Expense> getAllExpenses() {
-    List<Expense> list = new ArrayList<>();
-    String sql = "SELECT * FROM expenses ORDER BY date DESC";
-    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-      ResultSet rs = ps.executeQuery();
-      while (rs.next()) {
-        Expense e = new Expense();
-        e.setId(rs.getInt("id"));
-        e.setUserId(rs.getString("user_id"));
-        e.setCategoryId(rs.getInt("category_id"));
-        e.setAmount(rs.getDouble("amount"));
-        e.setDate(rs.getDate("date"));
-        e.setDescription(rs.getString("description"));
-        list.add(e);
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
+      list.add(e);
     }
     return list;
   }
 
   public List<Expense> searchByCategoryId(int categoryId) {
     List<Expense> list = new ArrayList<>();
-    String sql = "SELECT * FROM expenses WHERE category_id = ?";
+    String sql = "SELECT e.*, c.name AS category_name, u.username, u.first_name, u.last_name, u.role " +
+        "FROM expenses e " +
+        "JOIN categories c ON e.category_id = c.id " +
+        "JOIN users u ON e.user_id = u.username " +
+        "WHERE e.category_id = ?";
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
       ps.setInt(1, categoryId);
       ResultSet rs = ps.executeQuery();
       while (rs.next()) {
         Expense e = new Expense();
         e.setId(rs.getInt("id"));
-        e.setUserId(rs.getString("user_id"));
-        e.setCategoryId(rs.getInt("category_id"));
+
+        Category category = new Category();
+        category.setId(rs.getInt("category_id"));
+        category.setName(rs.getString("category_name"));
+        e.setCategory(category);
+
+        User user = UserFactory.createUserFromResultSet(rs);
+        e.setUser(user);
+
         e.setAmount(rs.getDouble("amount"));
         e.setDate(rs.getDate("date"));
         e.setDescription(rs.getString("description"));
@@ -157,15 +158,26 @@ public class ExpenseDAO {
 
   public List<Expense> searchByDate(String date) {
     List<Expense> list = new ArrayList<>();
-    String sql = "SELECT * FROM expenses WHERE date = ?";
+    String sql = "SELECT e.*, c.name AS category_name, u.username, u.first_name, u.last_name, u.role " +
+        "FROM expenses e " +
+        "JOIN categories c ON e.category_id = c.id " +
+        "JOIN users u ON e.user_id = u.username " +
+        "WHERE e.date = ?";
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
       ps.setDate(1, java.sql.Date.valueOf(date));
       ResultSet rs = ps.executeQuery();
       while (rs.next()) {
         Expense e = new Expense();
         e.setId(rs.getInt("id"));
-        e.setUserId(rs.getString("user_id"));
-        e.setCategoryId(rs.getInt("category_id"));
+
+        Category category = new Category();
+        category.setId(rs.getInt("category_id"));
+        category.setName(rs.getString("category_name"));
+        e.setCategory(category);
+
+        User user = UserFactory.createUserFromResultSet(rs);
+        e.setUser(user);
+
         e.setAmount(rs.getDouble("amount"));
         e.setDate(rs.getDate("date"));
         e.setDescription(rs.getString("description"));
@@ -179,15 +191,26 @@ public class ExpenseDAO {
 
   public List<Expense> searchByDescription(String keyword) {
     List<Expense> list = new ArrayList<>();
-    String sql = "SELECT * FROM expenses WHERE description LIKE ?";
+    String sql = "SELECT e.*, c.name AS category_name, u.username, u.first_name, u.last_name, u.role " +
+        "FROM expenses e " +
+        "JOIN categories c ON e.category_id = c.id " +
+        "JOIN users u ON e.user_id = u.username " +
+        "WHERE e.description LIKE ?";
     try (PreparedStatement ps = conn.prepareStatement(sql)) {
       ps.setString(1, "%" + keyword + "%");
       ResultSet rs = ps.executeQuery();
       while (rs.next()) {
         Expense e = new Expense();
         e.setId(rs.getInt("id"));
-        e.setUserId(rs.getString("user_id"));
-        e.setCategoryId(rs.getInt("category_id"));
+
+        Category category = new Category();
+        category.setId(rs.getInt("category_id"));
+        category.setName(rs.getString("category_name"));
+        e.setCategory(category);
+
+        User user = UserFactory.createUserFromResultSet(rs);
+        e.setUser(user);
+
         e.setAmount(rs.getDouble("amount"));
         e.setDate(rs.getDate("date"));
         e.setDescription(rs.getString("description"));

@@ -69,7 +69,7 @@ public class LoginFrame extends JFrame {
         JOptionPane.showMessageDialog(this, "Welcome, " + user.getFirstname());
 
         if (user.getRole() == User.Role.REGULAR) {
-          new UserDashboard((RegularUser) user, conn).setVisible(true);
+          new UserDashboard((RegularUser) user, conn);
         } else if (user.getRole() == User.Role.ADMIN) {
           new AdminDashboard((Admin) user, conn).setVisible(true);
         }
